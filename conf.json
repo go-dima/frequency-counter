@@ -1,0 +1,6 @@
+{
+  "ignore_list": ["dima", "spark"],
+  "log_level": "INFO",
+  "storage": ["console", "csv", "sqlite"],
+  "filenames": ["alice.txt"]
+}
