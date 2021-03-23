@@ -1,4 +1,6 @@
 import re
+import logging
+import statistics
 from typing import List
 
 from export import IExport, CSV, Console
@@ -22,21 +24,30 @@ class Counter:
                 self.words_dict[word] += 1
 
     def _top_k(self, k: int) -> List:
-        return sorted(self.words_dict.items(), key=lambda x: x[1], reverse=True)[:k]
+        top_k: List = sorted(self.words_dict.items(), key=lambda x: x[1], reverse=True)[:k]
+        logging.info(f"Mean:{statistics.mean(map(lambda t: t[1], top_k))}")
+        logging.info(f"Median:{statistics.median(map(lambda t: t[1], top_k))}")
+        return top_k
 
-    def add_exporter(self, exporter: IExport):
+    def add_exporter(self, exporter: IExport) -> None:
         self.exporters.append(exporter)
 
     def get_top_k(self, k: int) -> None:
+        top_k = self._top_k(k)
         for exporter in self.exporters:
-            exporter.export(self._top_k(k))
+            exporter.export(top_k)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     c: Counter = Counter("alice.txt")
 
     e1 = Console()
     c.add_exporter(e1)
+
+    e2 = CSV("output.csv")
+    c.add_exporter(e2)
+
     c.get_top_k(5)
 
 
@@ -45,3 +56,4 @@ if __name__ == "__main__":
 
 # TODOs:
 # - Remove numbers
+# - Accept exporters in ctor?

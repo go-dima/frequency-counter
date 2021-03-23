@@ -14,7 +14,9 @@ class CSV(IExport):
         self.filepath: str = filepath
 
     def export(self, to_export):
-        pass
+        with open(self.filepath, 'w') as csv_file:
+            for item in to_export:
+                print(f"{item[0]}, {item[1]}", file=csv_file)
 
 
 class SQL(IExport):
