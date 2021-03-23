@@ -4,12 +4,14 @@ import statistics
 from typing import List
 
 from export import IExport, CSV, Console
+from stop_words import get_stop_words
 
 
 class Counter:
     def __init__(self, filepath: str):
         self.words_dict = {}
         self.exporters: List[IExport] = []
+        self.stop_words = [w.strip('\'') for w in get_stop_words('en')]  # package contains words with '
         self.filepath = filepath
         self._parse_file()
 
@@ -18,7 +20,8 @@ class Counter:
             words = file.read()
             lowercase = [w.lower() for w in words.replace('\n', ' ').strip().split(' ')]
             only_alpha = [re.sub(r'\W+', '', w) for w in lowercase]
-            for word in [w for w in only_alpha if len(w) > 0]:
+            no_stop_words = [w for w in only_alpha if w not in self.stop_words and len(w) > 0]
+            for word in no_stop_words:
                 if word not in self.words_dict.keys():
                     self.words_dict[word] = 0
                 self.words_dict[word] += 1
