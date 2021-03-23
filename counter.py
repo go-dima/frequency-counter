@@ -4,7 +4,7 @@ import statistics
 from typing import List
 
 from stop_words import get_stop_words
-
+# from nltk.stem import WordNetLemmatizer
 from export import IExport
 
 
@@ -24,8 +24,9 @@ class Counter:
             no_special = [re.sub(r'\W+', '', w) for w in as_lowercase]
             only_alpha = [w for w in no_special if w.isalpha()]
             no_stop_words = [w for w in only_alpha if w not in self.stop_words and len(w) > 0]
-            no_ignored = [w for w in no_stop_words if w not in self.conf["ignore_list"]]
-            for word in no_ignored:
+            no_ignored = [w for w in no_stop_words if w not in self.ignored_list]
+            # lemmatized = [lemmatizer.lemmatize(w) for w in no_ignored] TODO: properly install nltk
+            for word in no_ignored:  # should be lemmatized
                 if word not in self.words_dict.keys():
                     self.words_dict[word] = 0
                 self.words_dict[word] += 1
