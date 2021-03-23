@@ -1,11 +1,13 @@
 import re
-from pprint import pprint
 from typing import List
+
+from export import IExport, CSV, Console
 
 
 class Counter:
     def __init__(self, filepath: str):
         self.words_dict = {}
+        self.exporters: List[IExport] = []
         self.filepath = filepath
         self._parse_file()
 
@@ -19,13 +21,24 @@ class Counter:
                     self.words_dict[word] = 0
                 self.words_dict[word] += 1
 
-    def get_top_k(self, k: int) -> List:
+    def _top_k(self, k: int) -> List:
         return sorted(self.words_dict.items(), key=lambda x: x[1], reverse=True)[:k]
+
+    def add_exporter(self, exporter: IExport):
+        self.exporters.append(exporter)
+
+    def get_top_k(self, k: int) -> None:
+        for exporter in self.exporters:
+            exporter.export(self._top_k(k))
 
 
 if __name__ == "__main__":
     c: Counter = Counter("alice.txt")
-    pprint(c.get_top_k(5))
+
+    e1 = Console()
+    c.add_exporter(e1)
+    c.get_top_k(5)
+
 
 # Assumptions:
 # Please do not reinvent the wheel means use existing libs
