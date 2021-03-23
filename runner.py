@@ -1,19 +1,35 @@
+import json
 import logging
 
 from counter import Counter
-from export import CSV, Console, SQLite
+from storage_factory import StorageFactory
+
+
+def read_config():
+    with open("conf.json", 'r') as conf_file:
+        return Config(**json.load(conf_file))
+
+
+class Config:
+    def __init__(self, log_level: str = "ERROR", ignore_list=None, storage=None):
+        if ignore_list is None:
+            ignore_list = []
+        if storage is None:
+            storage = ["console"]
+
+        self.log_level = log_level
+        self.ignore_list = ignore_list
+        self.storage = storage
+
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    c: Counter = Counter("alice.txt")
+    config = read_config()
+    logging.basicConfig(level=config.log_level)
 
-    e1 = Console()
-    c.add_exporter(e1)
+    c: Counter = Counter("alice.txt", config.ignore_list)
+    storage_factory = StorageFactory()
 
-    e2 = CSV("output.csv")
-    c.add_exporter(e2)
-
-    e3 = SQLite("sqlite.db")
-    c.add_exporter(e3)
+    for storage_type in config.storage:
+        c.add_exporter(storage_factory.produce(storage_type))
 
     c.get_top_k(5)

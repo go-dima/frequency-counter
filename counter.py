@@ -1,4 +1,3 @@
-import json
 import logging
 import re
 import statistics
@@ -10,13 +9,12 @@ from export import IExport
 
 
 class Counter:
-    def __init__(self, filepath: str):
+    def __init__(self, filepath: str, ignored_list: List[str]):
         self.words_dict = {}
         self.exporters: List[IExport] = []
         self.stop_words = [w.strip('\'') for w in get_stop_words('en')]  # package contains words with '
         self.filepath = filepath
-        with open("conf.json", 'r') as conf_file:
-            self.conf = json.load(conf_file)
+        self.ignored_list = ignored_list
         self._parse_file()
 
     def _parse_file(self) -> None:
