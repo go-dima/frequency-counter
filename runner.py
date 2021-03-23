@@ -3,7 +3,7 @@ import logging
 import statistics
 from typing import List
 
-from export import IExport, CSV, Console
+from export import IExport, CSV, Console, SQLite
 from stop_words import get_stop_words
 
 
@@ -50,6 +50,9 @@ if __name__ == "__main__":
 
     e2 = CSV("output.csv")
     c.add_exporter(e2)
+
+    e3 = SQLite("sqlite.db")
+    c.add_exporter(e3)
 
     c.get_top_k(5)
 
